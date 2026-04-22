@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리들요양원 - 굽은나무 앱 도입 안내</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Warm Forest (Neutral backgrounds with calming green accents to represent the 'Gubunnamu' (Bent Tree) theme and nursing home environment) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Welcoming message and core purpose of the app.
+         2. Interactive Features Dashboard: Allows users to click through the 6 main features. Instead of a long list, it uses a tabbed interface to keep the screen clean and engaging.
+         3. Value Visualization: A radar chart comparing the expected improvements in communication and transparency with the new app versus the old system.
+         4. Step-by-Step Guide: Clear, visually separated instructions for installation and login, highlighting the critical ID/PW rules.
+         5. Important Notice: The Naver Band closure warning displayed prominently.
+         This structure is chosen to reduce cognitive load for elderly guardians, making the transition as smooth and intuitive as possible. 
+    -->
+    <!-- Visualization & Content Choices: 
+         - Report Info: 6 Main Features -> Goal: Organize & Inform -> Viz: Interactive Tabbed Cards -> Interaction: Click to reveal details -> Justification: Prevents text overload, encourages exploration. -> Library: Vanilla JS + HTML/CSS.
+         - Report Info: Transition to new app -> Goal: Compare -> Viz: Radar Chart -> Interaction: Hover for tooltips -> Justification: Visually demonstrates the benefits (Speed, Transparency, etc.) of the new system. -> Library: Chart.js (Canvas).
+         - Report Info: Login/Install Guide -> Goal: Inform -> Viz: Step-by-step layout with Unicode icons -> Interaction: Responsive layout -> Justification: Clear, sequential reading path. -> Library: HTML/CSS.
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. 
+    -->
+
+    <style>
+        /* Custom styles for specific requirements */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #FDFBF7; /* Warm off-white */
+            color: #333333;
+        }
+        
+        /* Chart Container Styling Requirement */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Constrain max width */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Hide scrollbar for clean horizontal scrolling if needed (prevented generally, but good for flex containers) */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: {
+                            50: '#f2fdf4',
+                            100: '#e0fbe5',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        },
+                        warm: {
+                            50: '#FDFBF7',
+                            100: '#F5F2EB',
+                            200: '#E8E2D2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="antialiased selection:bg-forest-200 selection:text-forest-800">
+
+    <!-- Header / Hero Section -->
+    <header class="bg-forest-800 text-white py-16 px-4 shadow-md relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 text-[200px] leading-none pointer-events-none text-center select-none">
+            🌳
+        </div>
+        <div class="max-w-4xl mx-auto relative z-10 text-center">
+            <h1 class="text-sm md:text-base font-semibold tracking-wider text-forest-100 mb-2">우리들요양원 스마트 소통 플랫폼</h1>
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">'굽은나무' 어플 도입 안내</h2>
+            <p class="text-lg md:text-xl text-forest-50 max-w-2xl mx-auto leading-relaxed">
+                평소 저희 요양원을 믿고 어르신을 맡겨주시는 보호자님들께 깊은 감사를 드립니다.<br>
+                어르신의 일상과 건강 상태를 보다 투명하고 신속하게 공유하기 위해, 요양기관 전용 소통 앱을 새롭게 시작합니다.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 space-y-16">
+
+        <!-- Section 1: Interactive Features -->
+        <section id="features-section" class="bg-white rounded-2xl shadow-sm border border-warm-200 p-6 md:p-10">
+            <div class="text-center mb-10">
+                <span class="text-4xl mb-4 block">📱</span>
+                <h3 class="text-2xl md:text-3xl font-bold text-forest-800 mb-4">주요 기능 살펴보기</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    '굽은나무'는 기관과 보호자님을 잇는 따뜻한 소통 공간입니다. 아래 버튼을 클릭하여 어르신의 안부를 확인할 수 있는 다양한 기능들을 미리 체험해 보세요.
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Feature Navigation -->
+                <div class="w-full md:w-1/3 flex flex-row md:flex-col gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+                    <button onclick="showFeature(0)" id="btn-feat-0" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-semibold text-forest-800 bg-forest-50 border border-forest-200 shadow-sm">💬 라이브톡</button>
+                    <button onclick="showFeature(1)" id="btn-feat-1" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50">🗓️ 일정표</button>
+                    <button onclick="showFeature(2)" id="btn-feat-2" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50">📢 공지글</button>
+                    <button onclick="showFeature(3)" id="btn-feat-3" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50">🩺 의료재활</button>
+                    <button onclick="showFeature(4)" id="btn-feat-4" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50">📁 문서함</button>
+                    <button onclick="showFeature(5)" id="btn-feat-5" class="flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50">⭐ 만족도조사</button>
+                </div>
+
+                <!-- Feature Display Content -->
+                <div class="w-full md:w-2/3 bg-warm-50 rounded-2xl p-6 md:p-8 flex flex-col justify-center min-h-[250px] border border-warm-100 transition-opacity duration-300" id="feature-content-container">
+                    <div class="text-6xl mb-4" id="feat-icon">💬</div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3" id="feat-title">라이브톡 (1:1 SNS)</h4>
+                    <p class="text-gray-600 text-lg leading-relaxed" id="feat-desc">기관과 보호자가 서로 자유롭게 메시지를 주고받을 수 있는 개인 SNS 공간입니다. 평소 궁금하셨던 점을 언제든 편하게 물어보세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Data Visualization (Why change?) -->
+        <section id="chart-section" class="bg-white rounded-2xl shadow-sm border border-warm-200 p-6 md:p-10">
+            <div class="text-center mb-10">
+                <span class="text-4xl mb-4 block">📈</span>
+                <h3 class="text-2xl md:text-3xl font-bold text-forest-800 mb-4">도입 기대 효과</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    새로운 플랫폼 도입을 통해 보호자님과의 소통 품질이 다방면으로 크게 향상될 것으로 기대하고 있습니다. 아래 차트는 기존 방식 대비 '굽은나무' 앱의 장점을 보여줍니다.
+                </p>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="benefitChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Section 3: Installation & Login Guide -->
+        <section id="guide-section" class="mb-12">
+            <div class="text-center mb-10">
+                <span class="text-4xl mb-4 block">⚙️</span>
+                <h3 class="text-2xl md:text-3xl font-bold text-forest-800 mb-4">앱 설치 및 로그인 방법</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    보호자님의 휴대폰에 앱을 설치하신 후, 간단한 정보 입력만으로 즉시 이용 가능합니다. 아래 순서를 천천히 따라해 주세요.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Step 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-forest-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-forest-100 text-forest-700 flex items-center justify-center font-bold text-xl">1</div>
+                        <h4 class="text-xl font-bold text-gray-800">앱 설치하기</h4>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-warm-50 p-4 rounded-xl border border-warm-100">
+                            <p class="font-semibold text-forest-800 mb-1">🤖 안드로이드 (삼성, LG 등)</p>
+                            <p class="text-gray-600 text-sm">플레이스토어에서 검색 후 설치</p>
+                            <div class="mt-2 text-xs text-gray-500 bg-white p-2 rounded inline-block">
+                                🔍 검색어: <span class="font-bold text-forest-600">굽은나무, 엔젤시스템, LCMS</span>
+                            </div>
+                        </div>
+                        <div class="bg-warm-50 p-4 rounded-xl border border-warm-100">
+                            <p class="font-semibold text-gray-800 mb-1">🍎 아이폰 (iPhone)</p>
+                            <p class="text-gray-600 text-sm">앱스토어에서 검색 후 설치</p>
+                            <div class="mt-2 text-xs text-gray-500 bg-white p-2 rounded inline-block">
+                                🔍 검색어: <span class="font-bold text-gray-700">굽은나무</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-yellow-500 relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded animate-pulse">중요!</div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold text-xl">2</div>
+                        <h4 class="text-xl font-bold text-gray-800">로그인 정보 입력</h4>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-6 pb-4 border-b border-gray-100">별도의 회원가입 없이 아래 정보로 바로 로그인 됩니다.</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">아이디 (ID)</label>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 font-mono flex items-center gap-2">
+                                📱 보호자님의 <span class="font-bold text-forest-700">휴대폰 번호</span>
+                            </div>
+                            <p class="text-xs text-red-500 mt-1 pl-1">* 반드시 요양원에 등록된 번호와 동일해야 합니다.</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">비밀번호 (PW)</label>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 font-mono flex items-center gap-2">
+                                🎂 어르신의 <span class="font-bold text-forest-700">법적 생년월일 6자리</span>
+                            </div>
+                            <div class="mt-2 bg-yellow-50 p-3 rounded text-sm text-yellow-800 border border-yellow-100">
+                                <strong>예시:</strong> 1963년 7월 3일생인 경우 → <strong class="text-lg tracking-widest bg-white px-2 py-1 rounded shadow-sm">630703</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Notice -->
+        <section class="bg-red-50 border border-red-200 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+            <div class="text-5xl">⚠️</div>
+            <div>
+                <h4 class="text-xl font-bold text-red-800 mb-2">기존 네이버 밴드 운영 종료 안내</h4>
+                <p class="text-red-700 leading-relaxed">
+                    새로운 소통 앱 도입에 따라, <strong>기존에 운영되었던 네이버 밴드는 폐쇄될 예정</strong>입니다. 앞으로 어르신의 소식과 모든 안내는 오직 '굽은나무' 앱을 통해서만 전달되오니 이 점 너른 양해 부탁드립니다.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-forest-900 text-forest-200 py-10 text-center px-4 mt-8">
+        <p class="mb-4">어르신의 더 나은 일상을 위해 늘 노력하는 우리들요양원이 되겠습니다.</p>
+        <p class="text-sm">사용 방법이 어렵거나 궁금하신 점이 있다면 언제든 <strong>우리들요양원</strong>으로 연락해 주세요.</p>
+        <div class="mt-6 pt-6 border-t border-forest-800 text-forest-400 text-sm">
+            &copy; 2026 우리들요양원. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 1. Interactive Features Data & Logic
+        const featuresData = [
+            {
+                title: "라이브톡 (1:1 SNS)",
+                icon: "💬",
+                desc: "기관과 보호자가 서로 자유롭게 메시지를 주고받을 수 있는 개인 SNS 공간입니다. 평소 궁금하셨던 점을 언제든 편하게 물어보세요."
+            },
+            {
+                title: "일정표",
+                icon: "🗓️",
+                desc: "요양원의 한 달 행사 및 다채로운 프로그램 일정을 한눈에 확인하실 수 있습니다. 어르신께서 어떤 활동을 하시는지 파악해 보세요."
+            },
+            {
+                title: "공지글",
+                icon: "📢",
+                desc: "기관에서 전달하는 중요 안내 사항, 행사 소식 등을 일괄적으로 신속하게 받아보실 수 있습니다. 놓치는 정보 없이 꼼꼼히 챙겨드립니다."
+            },
+            {
+                title: "의료재활 서비스",
+                icon: "🩺",
+                desc: "어르신의 일일 건강 상태, 투약 관리, 입원 및 외래 진료 정보 등 전문적이고 상세한 케어 기록을 투명하게 확인하실 수 있습니다."
+            },
+            {
+                title: "문서함",
+                icon: "📁",
+                desc: "계약서, 급여제공계획서 등 보호자님께서 확인하셔야 할 중요한 행정 서류를 스마트폰에서 간편하게 열람하고 관리하실 수 있습니다."
+            },
+            {
+                title: "만족도 조사",
+                icon: "⭐",
+                desc: "더 나은 요양 서비스를 제공하기 위해 보호자님의 소중한 의견을 듣는 공간입니다. 불편하신 점이나 건의사항을 남겨주세요."
+            }
+        ];
+
+        function showFeature(index) {
+            // Update content
+            const contentContainer = document.getElementById('feature-content-container');
+            const iconEl = document.getElementById('feat-icon');
+            const titleEl = document.getElementById('feat-title');
+            const descEl = document.getElementById('feat-desc');
+
+            // Simple fade effect
+            contentContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                iconEl.innerText = featuresData[index].icon;
+                titleEl.innerText = featuresData[index].title;
+                descEl.innerText = featuresData[index].desc;
+                contentContainer.style.opacity = '1';
+            }, 150);
+
+            // Update button styles
+            for (let i = 0; i < featuresData.length; i++) {
+                const btn = document.getElementById(`btn-feat-${i}`);
+                if (i === index) {
+                    btn.className = "flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-semibold text-forest-800 bg-forest-50 border border-forest-200 shadow-sm";
+                } else {
+                    btn.className = "flex-shrink-0 text-left px-5 py-4 rounded-xl transition-all duration-200 font-medium text-gray-500 hover:bg-warm-50 border border-transparent";
+                }
+            }
+        }
+
+        // 2. Chart.js Implementation (Radar Chart comparing old vs new)
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('benefitChart').getContext('2d');
+            
+            const data = {
+                labels: [
+                    ['정보 전달', '신속성'], 
+                    ['상태 공유', '투명성'], 
+                    ['행정 서류', '접근성'], 
+                    ['양방향', '소통 편의'], 
+                    ['건강/투약', '상세 정보']
+                ],
+                datasets: [{
+                    label: '기존 방식 (네이버 밴드/전화)',
+                    data: [60, 50, 40, 60, 50],
+                    fill: true,
+                    backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                    borderColor: 'rgba(156, 163, 175, 1)',
+                    pointBackgroundColor: 'rgba(156, 163, 175, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(156, 163, 175, 1)',
+                    borderWidth: 2
+                }, {
+                    label: '새로운 플랫폼 (굽은나무 앱)',
+                    data: [95, 100, 90, 100, 95],
+                    fill: true,
+                    backgroundColor: 'rgba(34, 197, 94, 0.2)', // Forest-500 with opacity
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Important for responsive container
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    family: "'Pretendard', sans-serif",
+                                    size: 13
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            padding: 10,
+                            bodyFont: {
+                                family: "'Pretendard', sans-serif",
+                                size: 14
+                            },
+                            titleFont: {
+                                family: "'Pretendard', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    family: "'Pretendard', sans-serif",
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                color: '#4b5563'
+                            },
+                            ticks: {
+                                display: false, // Hide numeric ticks for a cleaner look
+                                min: 0,
+                                max: 100
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>
